@@ -1,7 +1,7 @@
 .SILENT :
 .PHONY : docker-gen clean fmt
 
-TAG:=0.7.4_1
+TAG:=0.7.5
 LDFLAGS:=-X main.buildVersion=$(TAG)
 
 all: docker-gen
