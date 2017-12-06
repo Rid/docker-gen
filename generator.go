@@ -200,7 +200,7 @@ func (g *generator) generateFromEvents() {
 			watchers = append(watchers, watcher)
 
 			debouncedChan := newDebounceChannel(watcher, config.Wait)
-			for _ = range debouncedChan {
+			for range debouncedChan {
 				containers, err := g.getContainers()
 				if err != nil {
 					log.Printf("Error listing containers: %s\n", err)

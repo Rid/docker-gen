@@ -6,7 +6,7 @@ import (
 	"strings"
 )
 
-func stripPrefix(s, prefix string) string {
+func stripPrefix(s string) string {
 	path := s
 	for {
 		if strings.HasPrefix(path, ".") {
@@ -23,7 +23,7 @@ func deepGet(item interface{}, path string) interface{} {
 		return item
 	}
 
-	path = stripPrefix(path, ".")
+	path = stripPrefix(path)
 	parts := strings.Split(path, ".")
 	itemValue := reflect.ValueOf(item)
 

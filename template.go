@@ -45,7 +45,7 @@ func getArrayValues(funcName string, entries interface{}) (*reflect.Value, error
 	case reflect.Array, reflect.Slice:
 		break
 	default:
-		return nil, fmt.Errorf("Must pass an array or slice to '%v'; received %v; kind %v", funcName, entries, kind)
+		return nil, fmt.Errorf("must pass an array or slice to '%v'; received %v; kind %v", funcName, entries, kind)
 	}
 	return &entriesVal, nil
 }
@@ -105,7 +105,7 @@ func groupByKeys(entries interface{}, key string) ([]string, error) {
 		return nil, err
 	}
 
-	ret := []string{}
+	var ret []string
 	for k := range keys {
 		ret = append(ret, k)
 	}
@@ -121,7 +121,7 @@ func groupByLabel(entries interface{}, label string) (map[string][]interface{}, 
 			}
 			return nil, nil
 		}
-		return nil, fmt.Errorf("Must pass an array or slice of RuntimeContainer to 'groupByLabel'; received %v", v)
+		return nil, fmt.Errorf("must pass an array or slice of RuntimeContainer to 'groupByLabel'; received %v", v)
 	}
 	return generalizedGroupBy("groupByLabel", entries, getLabel, func(groups map[string][]interface{}, value interface{}, v interface{}) {
 		groups[value.(string)] = append(groups[value.(string)], v)
@@ -184,19 +184,19 @@ func whereAny(entries interface{}, key, sep string, cmp []string) (interface{}, 
 
 // selects entries based on key.  Assumes key is delimited and breaks it apart before comparing
 func whereAll(entries interface{}, key, sep string, cmp []string) (interface{}, error) {
-	req_count := len(cmp)
+	reqCount := len(cmp)
 	return generalizedWhere("whereAll", entries, key, func(value interface{}) bool {
 		if value == nil {
 			return false
 		} else {
 			items := strings.Split(value.(string), sep)
-			return len(intersect(cmp, items)) == req_count
+			return len(intersect(cmp, items)) == reqCount
 		}
 	})
 }
 
 // generalized whereLabel function
-func generalizedWhereLabel(funcName string, containers Context, label string, test func(string, bool) bool) (Context, error) {
+func generalizedWhereLabel(containers Context, label string, test func(string, bool) bool) (Context, error) {
 	selection := make([]*RuntimeContainer, 0)
 
 	for i := 0; i < len(containers); i++ {
@@ -213,14 +213,14 @@ func generalizedWhereLabel(funcName string, containers Context, label string, te
 
 // selects containers that have a particular label
 func whereLabelExists(containers Context, label string) (Context, error) {
-	return generalizedWhereLabel("whereLabelExists", containers, label, func(_ string, ok bool) bool {
+	return generalizedWhereLabel(containers, label, func(_ string, ok bool) bool {
 		return ok
 	})
 }
 
 // selects containers that have don't have a particular label
 func whereLabelDoesNotExist(containers Context, label string) (Context, error) {
-	return generalizedWhereLabel("whereLabelDoesNotExist", containers, label, func(_ string, ok bool) bool {
+	return generalizedWhereLabel(containers, label, func(_ string, ok bool) bool {
 		return !ok
 	})
 }
@@ -232,7 +232,7 @@ func whereLabelValueMatches(containers Context, label, pattern string) (Context,
 		return nil, err
 	}
 
-	return generalizedWhereLabel("whereLabelValueMatches", containers, label, func(value string, ok bool) bool {
+	return generalizedWhereLabel(containers, label, func(value string, ok bool) bool {
 		return ok && rx.MatchString(value)
 	})
 }
@@ -254,7 +254,7 @@ func keys(input interface{}) (interface{}, error) {
 
 	val := reflect.ValueOf(input)
 	if val.Kind() != reflect.Map {
-		return nil, fmt.Errorf("Cannot call keys on a non-map value: %v", input)
+		return nil, fmt.Errorf("cannot call keys on a non-map value: %v", input)
 	}
 
 	vk := val.MapKeys()
@@ -365,7 +365,7 @@ func arrayClosest(values []string, input string) string {
 
 // dirList returns a list of files in the specified path
 func dirList(path string) ([]string, error) {
-	names := []string{}
+	var names []string
 	files, err := ioutil.ReadDir(path)
 	if err != nil {
 		log.Printf("Template error: %v", err)
@@ -508,7 +508,7 @@ func GenerateFile(config Config, containers Context) bool {
 			log.Fatalf("Failed to write to temp file: wrote %d, exp %d, err=%v", n, len(contents), err)
 		}
 
-		oldContents := []byte{}
+		var oldContents []byte
 		if fi, err := os.Stat(config.Dest); err == nil {
 			if err := dest.Chmod(fi.Mode()); err != nil {
 				log.Fatalf("Unable to chmod temp file: %s\n", err)

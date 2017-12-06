@@ -105,7 +105,7 @@ func (r *RuntimeContainer) Equals(o RuntimeContainer) bool {
 }
 
 func (r *RuntimeContainer) PublishedAddresses() []Address {
-	mapped := []Address{}
+	var mapped []Address
 	for _, address := range r.Addresses {
 		if address.HostPort != "" {
 			mapped = append(mapped, address)
