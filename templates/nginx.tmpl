@@ -3,6 +3,11 @@ server {
 	server_name _; # This is just an invalid value which will never trigger on a real hostname.
 	error_log /proc/self/fd/2;
 	access_log /proc/self/fd/1;
+    error_page 503 502 /custom_50x.html;
+    location = /custom_50x.html {
+            root /usr/share/nginx/html;
+            internal;
+    }
 	return 503;
 }
 
