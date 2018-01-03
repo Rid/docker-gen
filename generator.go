@@ -224,8 +224,9 @@ func (g *generator) generateFromEvents() {
 		eventChan := make(chan *docker.APIEvents, 100)
 		sigChan := newSignalChannel()
 
-		// Ping each client, every 10 seconds
-		timeout := time.Duration(10 / len(g.Clients))
+		timeout := time.Duration(10000 / len(g.Clients)) * time.Millisecond
+
+		log.Printf("Pinging daemons every %v", timeout)
 
 		for {
 			watching := make([]bool, len(g.Clients))
@@ -298,7 +299,7 @@ func (g *generator) generateFromEvents() {
 								watcher <- event
 							}
 						}
-					case <-time.After(timeout * time.Second):
+					case <-time.After(timeout):
 					// check for docker liveness
 						err := client.Ping()
 						if err != nil {
